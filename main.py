@@ -1,5 +1,26 @@
 import streamlit as st
 import pandas as pd
+
+def calc_general_stats(df):
+    df_data = df.groupby(by="Data")[["Valor"]].sum()
+    df_data["lag_1"] = df_data["Valor"].shift(1)
+    df_data["Diferença Mensal Abs."] = df_data["Valor"] -  df_data["lag_1"]
+    df_data["Média 6M Diferença Mensal Abs."] = df_data["Diferença Mensal Abs."].rolling(6).mean()
+    df_data["Média 12M Diferença Mensal Abs."] = df_data["Diferença Mensal Abs."].rolling(12).mean()
+    df_data["Média 24M Diferença Mensal Abs."] = df_data["Diferença Mensal Abs."].rolling(24).mean()
+
+
+    df_data["Diferença Mensal Rel."] =  df_data["Valor"] /  df_data["lag_1"] - 1 
+
+    df_data["Evolução 6M Total"] = df_data["Valor"].rolling(6).apply(lambda x: x.iloc[-1] - x.iloc[0])
+    df_data["Evolução 12M Total"] = df_data["Valor"].rolling(12).apply(lambda x: x.iloc[-1] - x.iloc[0])
+    df_data["Evolução 24M Total"] = df_data["Valor"].rolling(24).apply(lambda x: x.iloc[-1] - x.iloc[0])
+
+    df_data["Evolução 6M Relativa"] = df_data["Valor"].rolling(6).apply(lambda x: x.iloc[-1] / x.iloc[0])
+    df_data["Evolução 12M Relativa"] = df_data["Valor"].rolling(12).apply(lambda x: x.iloc[-1] / x.iloc[0])
+    df_data["Evolução 24M Relativa"] = df_data["Valor"].rolling(24).apply(lambda x: x.iloc[-1] / x.iloc[0])
+
+    return df_data
 st.set_page_config(page_title="Finanças", page_icon="💰")
 
 st.markdown('''
@@ -38,8 +59,7 @@ if file_upload:
             st.warning("Entre com uma data válida")
         else:
             st.bar_chart(df_instituicao.loc[date])
+  
 
-    df_data = df.groupby(by="Data")["Valor"].sum()
-    df_data["lag_1"] = df_data["Valor"].shift(1)
-    df_data["Diferença Mensal"] = df_data["Valor"] -  df_data["lag_1"]
-    st.dataframe(df_data)
+    df_stats = calc_general_stats(df)
+    st.dataframe(df_stats)
