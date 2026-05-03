@@ -81,5 +81,26 @@ if file_upload:
 
 
     }
+    
+    tab_sats, tab_abs, tab_rel = exp3.tabs(tabs=["Dados", "Histórico de Evolução", "Crescimento Relativo"])
+    
 
-    exp3.dataframe(df_stats, column_config=columns_config)
+    with tab_sats:
+        st.dataframe(df_stats, column_config=columns_config)
+
+    with tab_abs:
+        abs_cols =  ["Diferença Mensal Abs.",
+        "Média 6M Diferença Mensal Abs.", 
+        "Média 12M Diferença Mensal Abs.",
+        "Média 24M Diferença Mensal Abs.",
+        ]
+        st.line_chart(df_stats[abs_cols])
+    
+    with tab_rel:
+       rel_cols = [
+       "Diferença Mensal Rel.",
+       "Evolução 6M Relativa",
+       "Evolução 12M Relativa",
+       "Evolução 24M Relativa",
+       ]
+       st.line_chart(data=df_stats[rel_cols])
