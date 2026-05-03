@@ -20,6 +20,8 @@ def calc_general_stats(df):
     df_data["Evolução 12M Relativa"] = df_data["Valor"].rolling(12).apply(lambda x: x.iloc[-1] / x.iloc[0])
     df_data["Evolução 24M Relativa"] = df_data["Valor"].rolling(24).apply(lambda x: x.iloc[-1] / x.iloc[0])
 
+    df_data = df_data.drop("lag_1", axis=1)
+
     return df_data
 st.set_page_config(page_title="Finanças", page_icon="💰")
 
@@ -60,6 +62,24 @@ if file_upload:
         else:
             st.bar_chart(df_instituicao.loc[date])
   
-
+    exp3 = st.expander("Estatisticas Gerais")
     df_stats = calc_general_stats(df)
-    st.dataframe(df_stats)
+
+    columns_config = {
+        "Valor": st.column_config.NumberColumn('Valor', format="R$ %.2f"),
+        "Diferença Mensal Abs.": st.column_config.NumberColumn('Diferença Mensal Abs.', format="R$ %.2f"),
+        "Média 6M Diferença Mensal Abs.": st.column_config.NumberColumn('Média 6M Diferença Mensal Abs.', format="R$ %.2f"),
+        "Média 12M Diferença Mensal Abs.": st.column_config.NumberColumn('Média 12M Diferença Mensal Abs.', format="R$ %.2f"),
+        "Média 24M Diferença Mensal Abs.": st.column_config.NumberColumn('Média 24M Diferença Mensal Abs.', format="R$ %.2f"),
+        "Evolução 6M Total": st.column_config.NumberColumn('Evolução 6M Total', format="R$ %.2f"),
+        "Evolução 12M Total": st.column_config.NumberColumn('Evolução 12M Total', format="R$ %.2f"),
+        "Evolução 24M Total" : st.column_config.NumberColumn('Evolução 24M Total', format="R$ %.2f"),
+        "Diferença Mensal Rel.": st.column_config.NumberColumn('Diferença Mensal Rel.', format="percent"),
+        "Evolução 6M Relativa": st.column_config.NumberColumn('Evolução 6M Relativa', format="percent"),
+        "Evolução 12M Relativa": st.column_config.NumberColumn('Evolução 12M Relativa', format="percent"),
+        "Evolução 24M Relativa": st.column_config.NumberColumn('Evolução 24M Relativa', format="percent"),
+
+
+    }
+
+    exp3.dataframe(df_stats, column_config=columns_config)
